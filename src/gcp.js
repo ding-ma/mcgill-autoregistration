@@ -1,10 +1,19 @@
 const puppeteer = require('puppeteer');
-const config = require("../credentials");
+const config = {
+    "email": "your.email@mail.mcgill.ca",
+    "password": "password",
+    "semester": "202005",
+    "CRN": ["329", "327", "527", "528"]
+};
 
-(async () => {
+
+exports.handler = async (req, res) => {
 
 
-    let browser = await puppeteer.launch({headless: false});
+    let browser = await puppeteer.launch({
+        args: ['--no-sandbox'],
+        headless: true
+    });
     let page = await browser.newPage();
     await page.goto('https://horizon.mcgill.ca/pban1/twbkwbis.P_WWWLogin', {waitUntil: 'networkidle0'});
 
@@ -39,9 +48,9 @@ const config = require("../credentials");
 
     try {
         await page.waitForSelector('.errortext', {timeout: 5000});
-        console.log("Registration failed - Class full");
+        res.send("Registration failed - Class full");
     } catch (error) {
-          // although this is inside a catch block, this is the case where registration was successful.
-        console.log("Successful registration");
-      }
-})();
+        // although this is inside a catch block, this is the case where registration was successful.
+        res.send("Successful registration");
+    }
+};
