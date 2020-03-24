@@ -31,12 +31,14 @@ const config = require("../credentials");
     //#term_id > option:nth-child(1)
 
     await page.waitForXPath("/html/body/div[3]/form/input", {waitUntil: 'networkidle0'}).then(selector => selector.click());
+    await page.waitForNavigation();
 
-    await page.type('input[name=crn_id1]', config.CRNs[0], {delay: 30});
-    // for (let i = 0; i <config.CRNs.length ; i++) {
-    //     let inputID = "#crn_id"+(i+1);
-    //     let crn = config.CRNs[i];
-    //     await page.type(inputID,crn,{delay: 30});
-    // }
-
+    //await page.$eval("#crn_id1", e1 => e1.value = config.CRNs[0]);
+    for (let i = 0; i < config.CRNs.length; i++) {
+        let inputID = "#crn_id" + (i + 1);
+        let crn = config.CRNs[i];
+        // await page.type(inputID, crn, {delay: 30});
+        await page.type(inputID, crn, {delay: 30})
+    }
+    await page.waitForXPath("/html/body/div[3]/form/input[19]", {waitUntil: 'networkidle0'}).then(selector => selector.click());
 })();

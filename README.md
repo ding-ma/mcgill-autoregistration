@@ -11,6 +11,7 @@ Within them, we can create a cron job and make it run a certain amount of time a
 3. Rename `example.json` to `credentials.json`
 
 Couple notes:
+* Each CRN must be within double quotes `"YOUR_CRN"`
 * The `semester`field needs to follow this pattern: YYYYMM
 * YYYY represents the academic year
 * MM is the semester where Fall is 09, Winter is 01, Summer is 05.\
