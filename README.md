@@ -20,7 +20,7 @@ For example, if I want to register for fall 2020, I would write 202009.\
 ## How to host on a cloud Service
 1. Create a Google Cloud Function with the `gcp.js` content. Use HTTP Trigger, 512mb of ram, function to execute is `handler`.
 2. Modify the JSON as needed in the script
-3. Once deployed, create Google Cloud Scheduler that calls the function every 1h. (safest time to not get banned from minerva)
+3. Once deployed, create Google Cloud Scheduler that calls the function every 1h (with this cron: `* 1 * * *`). (safest time to not get banned from minerva)
 
 ## Feature request 
 Create an issue and we will talk about it!
