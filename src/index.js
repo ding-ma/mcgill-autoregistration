@@ -6,6 +6,7 @@ const config = require("../credentials");
 
     let browser = await puppeteer.launch({headless: false});
     let page = await browser.newPage();
+    let selector = "h1"
     await page.goto('https://horizon.mcgill.ca/pban1/twbkwbis.P_WWWLogin', {waitUntil: 'networkidle0'});
 
     //logs in
@@ -36,4 +37,12 @@ const config = require("../credentials");
         await page.type(inputID, crn, {delay: 30})
     }
     await page.waitForXPath("/html/body/div[3]/form/input[19]", {waitUntil: 'networkidle0'}).then(selector => selector.click());
+
+    try {
+        await page.waitForSelector('.errortext', { timeout: 5000 })
+        console.log("pip couil");
+      } catch (error) {
+          // although this is inside a catch block, this is the case where registration was successful.
+        console.log("Successful registration");
+      }
 })();
