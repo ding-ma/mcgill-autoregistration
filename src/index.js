@@ -32,7 +32,7 @@ const config = require("../credentials");
 
     await page.waitForXPath("/html/body/div[3]/form/input", {waitUntil: 'networkidle0'}).then(selector => selector.click());
 
-    await page.type("#crn_id1", config.CRNs[0], {delay: 30});
+    await page.type('input[name=crn_id1]', config.CRNs[0], {delay: 30});
     // for (let i = 0; i <config.CRNs.length ; i++) {
     //     let inputID = "#crn_id"+(i+1);
     //     let crn = config.CRNs[i];
