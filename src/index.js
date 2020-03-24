@@ -30,9 +30,9 @@ const config = require("../credentials");
     await page.waitForNavigation();
 
     //inputs all the crn and submits them
-    for (let i = 0; i < config.CRNs.length; i++) {
+    for (let i = 0; i < config.CRN.length; i++) {
         let inputID = "#crn_id" + (i + 1);
-        let crn = config.CRNs[i];
+        let crn = config.CRN[i];
         await page.type(inputID, crn, {delay: 30})
     }
     await page.waitForXPath("/html/body/div[3]/form/input[19]", {waitUntil: 'networkidle0'}).then(selector => selector.click());
