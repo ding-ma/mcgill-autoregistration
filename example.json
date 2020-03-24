@@ -1,7 +1,7 @@
 {
   "email": "your.email@mail.mcgill.ca",
   "password": "pwd",
-  "semester": 202005,
+  "semester": "202005",
   "CRN": [
     "329",
     "661"
