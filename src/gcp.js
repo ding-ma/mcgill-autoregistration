@@ -59,11 +59,12 @@ exports.handler = async (req, res) => {
         let numbClass = classesList.length / 10;
         console.log("Registration failed " + numbClass + " class(es) failed");
         for (let i = 0; i < numbClass; i++) {
+            let failReason = classesList[i * 10];
             let classCrn = classesList[1 + i * 10];
             let classSubj = classesList[2 + i * 10];
             let classCode = classesList[3 + i * 10];
             let classType = classesList[5 + i * 10];
-            console.log("Failed to register to: CNR" + classCrn, classSubj + classCode, classType);
+            console.log("Failed (" + failReason.substr(0, failReason.length - 1) + ") to register to: CNR" + classCrn, classSubj + classCode, classType);
         }
     } catch (error) {
         // although this is inside a catch block, this is the case where registration was successful.
