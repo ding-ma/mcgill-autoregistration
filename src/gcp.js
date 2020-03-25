@@ -4,7 +4,7 @@ const config = {
     "password": "pwd",
     "semester": "202005",
     "CRN": ["329", "327", "527", "528"]
-}
+};
 
 
 exports.handler = async (req, res) => {
@@ -62,7 +62,8 @@ exports.handler = async (req, res) => {
             let classCrn = classesList[1 + i * 10];
             let classSubj = classesList[2 + i * 10];
             let classCode = classesList[3 + i * 10];
-            console.log("Failed to register to: CNR" + classCrn, classSubj + classCode);
+            let classType = classesList[5 + i * 10];
+            console.log("Failed to register to: CNR" + classCrn, classSubj + classCode, classType);
         }
     } catch (error) {
         // although this is inside a catch block, this is the case where registration was successful.
