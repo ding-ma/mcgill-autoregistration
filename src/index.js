@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 const config = require("../credentials");
 
+//todo: log into a file instead
 (async () => {
 
 
@@ -13,6 +14,7 @@ const config = require("../credentials");
     await page.type('#mcg_pw', config.password, {delay: 30});
     await page.click('#mcg_un_submit');
     await page.waitForNavigation({waitUntil: 'networkidle0'});
+    console.log("Login Successful");
 
     //navigation to student
     await page.waitForXPath("/html/body/div[1]/div[2]/span/map/table/tbody/tr[1]/td/table/tbody/tr/td[5]", {waitUntil: 'networkidle0'}).then(selector => selector.click());
@@ -29,6 +31,7 @@ const config = require("../credentials");
     await page.waitForXPath("/html/body/div[3]/form/input", {waitUntil: 'networkidle0'}).then(selector => selector.click());
     await page.waitForNavigation();
 
+    console.log("Term " + config.semester + " found, Starting to input CRNs");
     //inputs all the crn and submits them
     for (let i = 0; i < config.CRN.length; i++) {
         let inputID = "#crn_id" + (i + 1);
@@ -39,9 +42,24 @@ const config = require("../credentials");
 
     try {
         await page.waitForSelector('.errortext', {timeout: 5000});
-        console.log("Registration failed - Class full");
+
+        const selector = 'body > div.pagebodydiv > form > table:nth-child(23)';
+        const table = await page.$$eval(selector, trs => trs.map(tr => {
+            const tds = [...tr.getElementsByTagName('td')];
+            return tds.map(td => td.textContent);
+        }));
+
+        let classesList = table[0];
+        let numbClass = classesList.length / 10;
+        console.log("Registration failed " + numbClass + " class(es) failed");
+        for (let i = 0; i < numbClass; i++) {
+            let classCrn = classesList[1 + i * 10];
+            let classSubj = classesList[2 + i * 10];
+            let classCode = classesList[3 + i * 10];
+            console.log("Failed to register to: CNR" + classCrn, classSubj + classCode);
+        }
     } catch (error) {
           // although this is inside a catch block, this is the case where registration was successful.
-        console.log("Successful registration");
+        console.log("Success! All classes were registered.");
       }
 })();
