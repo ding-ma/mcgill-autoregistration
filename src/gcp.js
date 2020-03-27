@@ -27,7 +27,11 @@ exports.handler = async (req, res) => {
     await page.waitForXPath("/html/body/div[1]/div[2]/span/map/table/tbody/tr[1]/td/table/tbody/tr/td[5]", {waitUntil: 'networkidle0'}).then(selector => selector.click());
 
     //navigates to registration
-    await page.waitForXPath("/html/body/div[3]/table[1]/tbody/tr[2]/td[2]/a", {waitUntil: 'networkidle0'}).then(selector => selector.click());
+    /*
+McGill COVD19 changed the xpath old one: /html/body/div[3]/table[1]/tbody/tr[2]/td[2]/a
+ */
+    await page.waitForXPath("/html/body/div[3]/table[1]/tbody/tr[3]/td[2]/a", {waitUntil: 'networkidle0'}).then(selector => selector.click());
+    await page.waitForNavigation();
 
     //navigates to quick add drop
     await page.waitForXPath("/html/body/div[3]/table[1]/tbody/tr[3]/td[2]/a", {waitUntil: 'networkidle0'}).then(selector => selector.click());
@@ -57,7 +61,7 @@ exports.handler = async (req, res) => {
 
         let classesList = table[0];
         let numbClass = classesList.length / 10;
-        console.log("Registration failed " + numbClass + " class(es) failed");
+        console.log("Registration failed for " + numbClass + " class(es)");
         for (let i = 0; i < numbClass; i++) {
             let failReason = classesList[i * 10];
             let classCrn = classesList[1 + i * 10];
