@@ -1,5 +1,7 @@
 const puppeteer = require('puppeteer');
 const config = require("../credentials");
+
+//remove if dont want email service.
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey('YOUR_KEY');
 
@@ -90,6 +92,7 @@ sgMail.setApiKey('YOUR_KEY');
             console.log("Success! All classes were registered.");
         }
 
+        //remove from here
         let msg = {
             to: '@gmail.com',
             from: {
@@ -101,6 +104,7 @@ sgMail.setApiKey('YOUR_KEY');
         };
         sgMail.send(msg);
         console.log("Email Sent!");
+        //to here
 
     } else {
         console.log("Class is full!");

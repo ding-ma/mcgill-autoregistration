@@ -6,6 +6,9 @@ const config = {
     "CRN": ["329", "327", "527", "528"]
 };
 
+//remove if dont want email service.
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey('YOUR_KEY');
 
 exports.handler = async (req, res) => {
 
@@ -95,6 +98,8 @@ exports.handler = async (req, res) => {
             // although this is inside a catch block, this is the case where registration was successful.
             console.log("Success! All classes were registered.");
         }
+
+        //remove from here
         let msg = {
             to: '@gmail.com',
             from: {
@@ -106,6 +111,7 @@ exports.handler = async (req, res) => {
         };
         sgMail.send(msg);
         console.log("Email Sent!");
+        //to here!
 
     } else {
         console.log("Class is full!");
