@@ -42,7 +42,7 @@ This is to prevent using all the registration limit which is around 1000 per sem
 * To run on the cloud, we need to use the headless version of chrome ` headless: true`, if you want to see the browser,
 simply set to ` headless: false` in `gcp.js`. 
 * You can have conflicting classes schedule in VSB, the program will still work like this:
-![image](https://user-images.githubusercontent.com/43629633/78501009-e05f6700-7727-11ea-91d5-e3f98ce7e77b.png)
+![image](https://user-images.githubusercontent.com/43629633/78501009-e05f6700-7727-11ea-91d5-e3f98ce7e77b.png)\
 You will need to find the CRN of them separately because VSB will not generate a schedule for you.
 
 ### Exmaple of Config
