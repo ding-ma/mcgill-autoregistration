@@ -24,7 +24,8 @@ The script first webscrappes VSB to determine if there is a place available in t
 3.1 I'm running mine every 30mins or so, if you would like to customize the time use this [amazing tool](https://crontab.guru/)
 
 ### To use SendGrid
-If you do not want to have email notifications, set `"wantEmail": false` in `config.wantEmail`.
+If you do not want to have email notifications, set `"wantEmail": false` in `config.wantEmail`.\
+To receive emails follow these steps:
 1. Sign up on [_sendgrid_](https://sendgrid.com/).
 2. Copy down the API key and use it in the program.
 3. Write your email on line 110 of `gcp.js`.
