@@ -1,9 +1,9 @@
 const puppeteer = require('puppeteer');
 const config = {
-    "email": "your.email@mail.mcgill.ca",
-    "password": "pwd",
+    "email": "xx@mail.mcgill.ca",
+    "password": "xx",
     "semester": "202005",
-    "CRN": ["123", "555"],
+    "CRN": ["527", "528", "491", "492", "850", "285", "288", "289"],
     "numberClass": 7,
     "wantEmail": true
 };
@@ -22,7 +22,7 @@ exports.Registration = async (req, res) => {
     let page = await browser.newPage();
 
     //URL from vsb
-    let url = "https://vsb.mcgill.ca/vsb/criteria.jsp?access=0&lang=en&tip=1&page=results&scratch=0&term=202005&sort=none&filters=iiiiiiiii&bbs=&ds=&cams=Distance_Downtown_Macdonald_Off-Campus&locs=any&isrts=&course_0_0=FACC-300&sa_0_0=&cs_0_0=--202005_527-528-&cpn_0_0=&csn_0_0=&ca_0_0=&dropdown_0_0=al&ig_0_0=0&rq_0_0=&course_1_0=ECON-208&sa_1_0=&cs_1_0=&cpn_1_0=&csn_1_0=&ca_1_0=&dropdown_1_0=al&ig_1_0=0&rq_1_0=&course_2_0=ECON-209&sa_2_0=&cs_2_0=&cpn_2_0=&csn_2_0=&ca_2_0=&dropdown_2_0=al&ig_2_0=0&rq_2_0=&course_3_0=MGCR-222&sa_3_0=&cs_3_0=&cpn_3_0=&csn_3_0=&ca_3_0=&dropdown_3_0=al&ig_3_0=0&rq_3_0=&course_4_0=ANTH-201&sa_4_0=&cs_4_0=&cpn_4_0=&csn_4_0=&ca_4_0=&dropdown_4_0=al&ig_4_0=0&rq_4_0=&course_5_0=ANTH-212&sa_5_0=&cs_5_0=&cpn_5_0=&csn_5_0=&ca_5_0=&dropdown_5_0=al&ig_5_0=0&rq_5_0=&course_6_0=ANTH-227&sa_6_0=&cs_6_0=&cpn_6_0=&csn_6_0=&ca_6_0=&dropdown_6_0=al&ig_6_0=0&rq_6_0=&course_7_0=MGCR-352&sa_7_0=&cs_7_0=&cpn_7_0=&csn_7_0=&ca_7_0=&dropdown_7_0=al&ig_7_0=0&rq_7_0=";
+    let url = "https://vsb.mcgill.ca/vsb/criteria.jsp?access=0&lang=en&tip=1&page=results&scratch=0&term=202005&sort=none&filters=iiiiiiiii&bbs=&ds=&cams=Distance_Downtown_Macdonald_Off-Campus&locs=any&isrts=&course_0_0=FACC-300&sa_0_0=&cs_0_0=--202005_527-528-&cpn_0_0=&csn_0_0=&ca_0_0=&dropdown_0_0=al&ig_0_0=0&rq_0_0=&course_1_0=ECON-208&sa_1_0=&cs_1_0=&cpn_1_0=&csn_1_0=&ca_1_0=&dropdown_1_0=al&ig_1_0=0&rq_1_0=&course_2_0=ECON-209&sa_2_0=&cs_2_0=&cpn_2_0=&csn_2_0=&ca_2_0=&dropdown_2_0=al&ig_2_0=0&rq_2_0=&course_3_0=MGCR-222&sa_3_0=&cs_3_0=&cpn_3_0=&csn_3_0=&ca_3_0=&dropdown_3_0=al&ig_3_0=0&rq_3_0=&course_4_0=ANTH-201&sa_4_0=&cs_4_0=&cpn_4_0=&csn_4_0=&ca_4_0=&dropdown_4_0=al&ig_4_0=0&rq_4_0=&course_5_0=ANTH-212&sa_5_0=&cs_5_0=&cpn_5_0=&csn_5_0=&ca_5_0=&dropdown_5_0=al&ig_5_0=0&rq_5_0=&course_6_0=ANTH-227&sa_6_0=&cs_6_0=&cpn_6_0=&csn_6_0=&ca_6_0=&dropdown_6_0=al&ig_6_0=0&rq_6_0=";
 
     await page.goto(url, {waitUntil: 'networkidle0'});
 
@@ -30,13 +30,18 @@ exports.Registration = async (req, res) => {
     //this grabs every div for the classes
     for (let i = 3; i <= config.numberClass + 3; i++) { //CHANGE this to the the number of classes you have
         let e = "/html/body/div[1]/div[2]/div[3]/div/table/tbody/tr/td[1]/div[3]/div[10]/div[" + i + "]/div[2]/div[5]/div";
-        let [element] = await page.$x(e);
-        let text = await page.evaluate(element => element.textContent, element);
-        console.log(text, i - 3, text.includes("All classes are full"));
-        if (!text.includes("All classes are full")) { //this checks that at least one of the classes has a free spot
-            canProceed = true;
+        try {
+            let [element] = await page.$x(e);
+            let text = await page.evaluate(element => element.textContent, element);
+            console.log(text, i - 2, text.includes("All classes are full"));
+            if (!text.includes("All classes are full")) { //this checks that at least one of the classes has a free spot
+                canProceed = true;
+                break;
+            }
+        } catch (e) {
             break;
         }
+
     }
 
     if (canProceed) {
@@ -108,7 +113,7 @@ exports.Registration = async (req, res) => {
         if (config.wantEmail) {
 
             let msg = {
-                to: 'yourEmail@gmail.com',
+                to: 'xx@gmail.com',
                 from: {
                     email: "minervaRegistration@mcgill.ca ",
                     name: "Minerva"

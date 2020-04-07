@@ -121,3 +121,6 @@ dist
 /.idea/mcgill-autoregistration.iml
 /.idea/misc.xml
 /.idea/modules.xml
+
+.env
+package-lock.json

@@ -54,7 +54,8 @@ const config = {
       "password": "pwd",
       "semester": "202005",
       "CRN": ["527", "528", "491", "492", "850", "285", "288", "289", "336"],
-      "numberClass": 7
+      "numberClass": 7,
+      "wantEmail": true
   };
 ````
 Notice how CRN 527 (lecture) and 528 (tutorial) for FACC300 is inputted.
