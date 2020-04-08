@@ -1,18 +1,34 @@
 const puppeteer = require('puppeteer');
-const config = {
-    "email": "xx@mail.mcgill.ca",
-    "password": "xx",
-    "semester": "202005",
-    "CRN": ["527", "528", "491", "850", "285", "288", "289"],
-    "wantEmail": true
-};
 
+/*
+EDIT THE CONFIG BELOW BEFORE RUNNING
+
+email: McGill Minerva username
+password: McGill Minerva password
+Term - Term you wish to register for, found in VSB URL (ex. term=202005)
+CRN - List of CRNs you wish to register for, found in VSB at bottom of screen
+url - Select the classes you want on VSB for your selected term then copy the URL over
+wantEmail - Set to true if you want an email notification upon successful registration
+notifEmail - Where to send notification email to, leave blank if wantEmail is false
+sgApiKey - Received when registered for sendgrid, leave blank is wantEmail is false
+*/
+
+const config = {
+    "regEmail": "firstname.lastname@mail.mcgill.ca",
+    "password": "password",
+    "term": "202005",
+    "CRN": ["527", "528", "491", "850", "285", "288", "289"],
+    "url": "https://vsb.mcgill.ca/vsb/criteria.jsp?access=0&lang=en&tip=1&page=results&scratch=0&term=202005&sort=none&filters=iiiiiiiii&bbs=&ds=&cams=Distance_Downtown_Macdonald_Off-Campus&locs=any&isrts=&course_0_0=FACC-300&sa_0_0=&cs_0_0=--202005_527-528-&cpn_0_0=&csn_0_0=&ca_0_0=&dropdown_0_0=al&ig_0_0=0&rq_0_0=&course_1_0=ECON-208&sa_1_0=&cs_1_0=&cpn_1_0=&csn_1_0=&ca_1_0=&dropdown_1_0=al&ig_1_0=0&rq_1_0=&course_2_0=MGCR-222&sa_2_0=&cs_2_0=&cpn_2_0=&csn_2_0=&ca_2_0=&dropdown_2_0=al&ig_2_0=0&rq_2_0=&course_3_0=ANTH-201&sa_3_0=&cs_3_0=&cpn_3_0=&csn_3_0=&ca_3_0=&dropdown_3_0=al&ig_3_0=0&rq_3_0=&course_4_0=ANTH-212&sa_4_0=&cs_4_0=&cpn_4_0=&csn_4_0=&ca_4_0=&dropdown_4_0=al&ig_4_0=0&rq_4_0=&course_5_0=ANTH-227&sa_5_0=&cs_5_0=&cpn_5_0=&csn_5_0=&ca_5_0=&dropdown_5_0=al&ig_5_0=0&rq_5_0=",
+    "wantEmail": true,
+    "notifEmail": "",
+    "sgApiKey": "SG.xxx..."
+};
 
 exports.Registration = async (req, res) => {
     const sgMail = require('@sendgrid/mail');
 
     if (config.wantEmail) {
-        sgMail.setApiKey('YOUR_API_KEY');
+        sgMail.setApiKey(config.sgApiKey);
     }
 
     let browser = await puppeteer.launch({
@@ -21,10 +37,7 @@ exports.Registration = async (req, res) => {
     });
     let page = await browser.newPage();
 
-    //URL from vsb
-    let url = "https://vsb.mcgill.ca/vsb/criteria.jsp?access=0&lang=en&tip=1&page=results&scratch=0&term=202005&sort=none&filters=iiiiiiiii&bbs=&ds=&cams=Distance_Downtown_Macdonald_Off-Campus&locs=any&isrts=&course_0_0=FACC-300&sa_0_0=&cs_0_0=--202005_527-528-&cpn_0_0=&csn_0_0=&ca_0_0=&dropdown_0_0=al&ig_0_0=0&rq_0_0=&course_1_0=ECON-208&sa_1_0=&cs_1_0=&cpn_1_0=&csn_1_0=&ca_1_0=&dropdown_1_0=al&ig_1_0=0&rq_1_0=&course_2_0=MGCR-222&sa_2_0=&cs_2_0=&cpn_2_0=&csn_2_0=&ca_2_0=&dropdown_2_0=al&ig_2_0=0&rq_2_0=&course_3_0=ANTH-201&sa_3_0=&cs_3_0=&cpn_3_0=&csn_3_0=&ca_3_0=&dropdown_3_0=al&ig_3_0=0&rq_3_0=&course_4_0=ANTH-212&sa_4_0=&cs_4_0=&cpn_4_0=&csn_4_0=&ca_4_0=&dropdown_4_0=al&ig_4_0=0&rq_4_0=&course_5_0=ANTH-227&sa_5_0=&cs_5_0=&cpn_5_0=&csn_5_0=&ca_5_0=&dropdown_5_0=al&ig_5_0=0&rq_5_0=";
-
-    await page.goto(url, {waitUntil: 'networkidle0'});
+    await page.goto(config.url, {waitUntil: 'networkidle0'});
 
     let canProceed = false;
     //this grabs every div for the classes
@@ -52,7 +65,7 @@ exports.Registration = async (req, res) => {
         await page.goto('https://horizon.mcgill.ca/pban1/twbkwbis.P_WWWLogin', {waitUntil: 'networkidle0'});
 
         //logs in
-        await page.type('#mcg_un', config.email, {delay: 30});
+        await page.type('#mcg_un', config.regEmail, {delay: 30});
         await page.type('#mcg_pw', config.password, {delay: 30});
         await page.click('#mcg_un_submit');
         await page.waitForNavigation({waitUntil: 'networkidle0'});
@@ -63,7 +76,7 @@ exports.Registration = async (req, res) => {
 
         //navigates to registration
         /*
-        McGill COVD19 changed the xpath old one: /html/body/div[3]/table[1]/tbody/tr[2]/td[2]/a
+        McGill COVID19 changed the xpath old one: /html/body/div[3]/table[1]/tbody/tr[2]/td[2]/a
          */
         await page.waitForXPath("/html/body/div[3]/table[1]/tbody/tr[3]/td[2]/a", {waitUntil: 'networkidle0'}).then(selector => selector.click());
         await page.waitForNavigation();
@@ -73,10 +86,10 @@ exports.Registration = async (req, res) => {
         await page.waitFor(500);
 
         //selects the term and navigates to next page
-        await page.select('#term_id', config.semester);
+        await page.select('#term_id', config.term);
         await page.waitForXPath("/html/body/div[3]/form/input", {waitUntil: 'networkidle0'}).then(selector => selector.click());
         await page.waitForNavigation();
-        console.log("Term " + config.semester + " found, Starting to input CRNs");
+        console.log("Term " + config.term + " found, Starting to input CRNs");
         //inputs all the crn and submits them
         for (let i = 0; i < config.CRN.length; i++) {
             let inputID = "#crn_id" + (i + 1);
@@ -115,12 +128,12 @@ exports.Registration = async (req, res) => {
         if (config.wantEmail) {
 
             let msg = {
-                to: 'xx@gmail.com',
+                to: config.notifEmail,
                 from: {
                     email: "minervaRegistration@mcgill.ca ",
                     name: "Minerva"
                 },
-                subject: "Successful Registration For Semester " + config.semester,
+                subject: "Successful Registration For Semester " + config.term,
                 text: "At least one class was registered. Please check minerva https://www.mcgill.ca/minerva"
             };
             await sgMail.send(msg);
