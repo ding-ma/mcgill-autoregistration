@@ -32,7 +32,6 @@ To receive emails follow these steps:
 
 
 ### Couple notes:
-* Tutorial doesn't need brackets for the CRN in `config` variable. They **DO NOT** count as a class in `config.numbClass`.
 * Each CRN must be within double quotes `"YOUR_CRN"`
 * The `semester`field needs to follow this pattern: YYYYMM
 * YYYY represents the academic year
@@ -54,7 +53,6 @@ const config = {
       "password": "pwd",
       "semester": "202005",
       "CRN": ["527", "528", "491", "492", "850", "285", "288", "289", "336"],
-      "numberClass": 7,
       "wantEmail": true
   };
 ````
