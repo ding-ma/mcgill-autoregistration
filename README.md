@@ -12,7 +12,7 @@ The script first webscrappes VSB to determine if there is a place available in t
 
 ## How To use locally
 1. Go on VSB and copy the URL after you have chosen your classes.
-2. Modify the content of `config` json in `src/gcp.js` to match yours. 
+2. Modify the content of `config` JSON in `src/gcp.js` to match yours. 
 4. The CRN is a list of all CRN of the class you would like to register. Those can be found on VSB also.
 4. To run, simply write `npm start` from the root of this project.
 
@@ -30,6 +30,16 @@ To receive emails follow these steps:
 2. Copy down the API key and use it in the program.
 3. Write your email on line 110 of `gcp.js`.
 
+### Documentaion of Config
+Below, all the fields of the `config` JSON are described
+* email: McGill Minerva username
+* password: McGill Minerva password
+* term: Term you wish to register for, found in VSB URL (ex. term=202005)
+* CRN: List of CRNs you wish to register for, found in VSB at bottom of screen
+* url: Select the classes you want on VSB for your selected term then copy the URL over
+* wantEmail: Set to true if you want an email notification upon successful registration
+* notifEmail: Where to send notification email to, leave as `""` if wantEmail is false
+* sgApiKey: Received when registered for sendgrid, leave as `""` if wantEmail is false
 
 ### Couple notes:
 * Each CRN must be within double quotes `"YOUR_CRN"`
@@ -45,16 +55,21 @@ simply set to ` headless: false` in `gcp.js`.
 ![image](https://user-images.githubusercontent.com/43629633/78501009-e05f6700-7727-11ea-91d5-e3f98ce7e77b.png)\
 You will need to find the CRN of them separately because VSB will not generate a schedule for you.
 
+
 ### Exmaple of Config
 Currently I want to register to all the classes shown in the image for the summer term, my `config` variable will look like this:
+
 ````
 const config = {
-      "email": "your.email@mail.mcgill.ca",
-      "password": "pwd",
-      "semester": "202005",
-      "CRN": ["527", "528", "491", "492", "850", "285", "288", "289", "336"],
-      "wantEmail": true
-  };
+    "regEmail": "firstname.lastname@mail.mcgill.ca",
+    "password": "password",
+    "term": "202005",
+    "CRN": ["527", "528", "491", "850", "285", "288", "289"],
+    "url": "https://vsb.mcgill.ca/vsb...",
+    "wantEmail": true,
+    "notifEmail": "",
+    "sgApiKey": "SG.xxx..."
+};
 ````
 Notice how CRN 527 (lecture) and 528 (tutorial) for FACC300 is inputted.
 
