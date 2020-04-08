@@ -8,12 +8,14 @@ const config = {
     "wantEmail": true
 };
 
-if (config.wantEmail) {
-    const sgMail = require('@sendgrid/mail');
-    sgMail.setApiKey('YOUR_API_KEY');
-}
+
 
 exports.Registration = async (req, res) => {
+    const sgMail = require('@sendgrid/mail');
+
+    if (config.wantEmail) {
+        sgMail.setApiKey('YOUR_API_KEY');
+    }
 
     let browser = await puppeteer.launch({
         args: ['--no-sandbox'],
@@ -22,7 +24,7 @@ exports.Registration = async (req, res) => {
     let page = await browser.newPage();
 
     //URL from vsb
-    let url = "https://vsb.mcgill.ca/vsb/criteria.jsp?access=0&lang=en&tip=1&page=results&scratch=0&term=202005&sort=none&filters=iiiiiiiii&bbs=&ds=&cams=Distance_Downtown_Macdonald_Off-Campus&locs=any&isrts=&course_0_0=FACC-300&sa_0_0=&cs_0_0=--202005_527-528-&cpn_0_0=&csn_0_0=&ca_0_0=&dropdown_0_0=al&ig_0_0=0&rq_0_0=&course_1_0=ECON-208&sa_1_0=&cs_1_0=&cpn_1_0=&csn_1_0=&ca_1_0=&dropdown_1_0=al&ig_1_0=0&rq_1_0=&course_2_0=ECON-209&sa_2_0=&cs_2_0=&cpn_2_0=&csn_2_0=&ca_2_0=&dropdown_2_0=al&ig_2_0=0&rq_2_0=&course_3_0=MGCR-222&sa_3_0=&cs_3_0=&cpn_3_0=&csn_3_0=&ca_3_0=&dropdown_3_0=al&ig_3_0=0&rq_3_0=&course_4_0=ANTH-201&sa_4_0=&cs_4_0=&cpn_4_0=&csn_4_0=&ca_4_0=&dropdown_4_0=al&ig_4_0=0&rq_4_0=&course_5_0=ANTH-212&sa_5_0=&cs_5_0=&cpn_5_0=&csn_5_0=&ca_5_0=&dropdown_5_0=al&ig_5_0=0&rq_5_0=&course_6_0=ANTH-227&sa_6_0=&cs_6_0=&cpn_6_0=&csn_6_0=&ca_6_0=&dropdown_6_0=al&ig_6_0=0&rq_6_0=";
+    let url = "https://vsb.mcgill.ca/vsb/criteria.jsp?access=0&lang=en&tip=1&page=results&scratch=0&term=202101&sort=none&filters=iiiiiiiii&bbs=&ds=&cams=Distance_Downtown_Macdonald_Off-Campus&locs=any&isrts=&course_0_0=COMP-409&sa_0_0=&cs_0_0=--202101_15805--&cpn_0_0=&csn_0_0=&ca_0_0=&dropdown_0_0=al&ig_0_0=0&rq_0_0=&course_1_0=COMP-424&sa_1_0=&cs_1_0=--202101_15807--&cpn_1_0=&csn_1_0=&ca_1_0=&dropdown_1_0=al&ig_1_0=0&rq_1_0=";
 
     await page.goto(url, {waitUntil: 'networkidle0'});
 
@@ -85,6 +87,7 @@ exports.Registration = async (req, res) => {
         await page.waitForXPath("/html/body/div[3]/form/input[19]", {waitUntil: 'networkidle0'}).then(selector => selector.click());
 
         //checks if there are errors after registration
+        let classesList;
         try {
             await page.waitForSelector('.errortext', {timeout: 5000});
 
@@ -94,7 +97,7 @@ exports.Registration = async (req, res) => {
                 return tds.map(td => td.textContent);
             }));
 
-            let classesList = table[0];
+            classesList = table[0];
             let numbClass = classesList.length / 10;
             console.log("Registration failed for " + numbClass + " class(es)");
             for (let i = 0; i < numbClass; i++) {
@@ -118,8 +121,8 @@ exports.Registration = async (req, res) => {
                     email: "minervaRegistration@mcgill.ca ",
                     name: "Minerva"
                 },
-                subject: "Summer Registration",
-                text: "One class was successfully registered!"
+                subject: "Successful Registration For Semester " + config.semester,
+                text: "At least one class was registered. Please check minerva https://www.mcgill.ca/minerva"
             };
             await sgMail.send(msg);
             console.log("Email Sent!");
