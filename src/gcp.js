@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer');
+const sgMail = require('@sendgrid/mail');
 
 /*
 EDIT THE CONFIG BELOW BEFORE RUNNING
@@ -16,16 +17,15 @@ sgApiKey - Received when registered for sendgrid, leave blank is wantEmail is fa
 const config = {
     "regEmail": "firstname.lastname@mail.mcgill.ca",
     "password": "password",
-    "term": "202005",
-    "CRN": ["527", "528", "491", "850", "285", "288", "289"],
-    "url": "https://vsb.mcgill.ca/vsb/criteria.jsp?access=0&lang=en&tip=1&page=results&scratch=0&term=202005&sort=none&filters=iiiiiiiii&bbs=&ds=&cams=Distance_Downtown_Macdonald_Off-Campus&locs=any&isrts=&course_0_0=FACC-300&sa_0_0=&cs_0_0=--202005_527-528-&cpn_0_0=&csn_0_0=&ca_0_0=&dropdown_0_0=al&ig_0_0=0&rq_0_0=&course_1_0=ECON-208&sa_1_0=&cs_1_0=&cpn_1_0=&csn_1_0=&ca_1_0=&dropdown_1_0=al&ig_1_0=0&rq_1_0=&course_2_0=MGCR-222&sa_2_0=&cs_2_0=&cpn_2_0=&csn_2_0=&ca_2_0=&dropdown_2_0=al&ig_2_0=0&rq_2_0=&course_3_0=ANTH-201&sa_3_0=&cs_3_0=&cpn_3_0=&csn_3_0=&ca_3_0=&dropdown_3_0=al&ig_3_0=0&rq_3_0=&course_4_0=ANTH-212&sa_4_0=&cs_4_0=&cpn_4_0=&csn_4_0=&ca_4_0=&dropdown_4_0=al&ig_4_0=0&rq_4_0=&course_5_0=ANTH-227&sa_5_0=&cs_5_0=&cpn_5_0=&csn_5_0=&ca_5_0=&dropdown_5_0=al&ig_5_0=0&rq_5_0=",
+    "term": "202009",
+    "CRN": ["289"],
+    "url": "VSB_URL",
     "wantEmail": true,
     "notifEmail": "",
     "sgApiKey": "SG.xxx..."
 };
 
 exports.Registration = async (req, res) => {
-    const sgMail = require('@sendgrid/mail');
 
     if (config.wantEmail) {
         sgMail.setApiKey(config.sgApiKey);
@@ -134,7 +134,7 @@ exports.Registration = async (req, res) => {
                     name: "Minerva"
                 },
                 subject: "Successful Registration For Semester " + config.term,
-                text: "At least one class was registered. Please check minerva https://www.mcgill.ca/minerva"
+                text: "At least one class was registered. Please check minerva @ www.mcgill.ca/minerva."
             };
             await sgMail.send(msg);
             console.log("Email Sent!");
