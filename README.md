@@ -13,7 +13,7 @@ The script first webscrappes VSB to determine if there is a place available in t
 1. Go on VSB and copy the URL after you have chosen your classes.
 2. Modify the content of `config` JSON in `src/gcp.js` to match yours. 
 4. The CRN is a list of all CRN of the class you would like to register. Those can be found on VSB also.
-4. To run, simply write `npm start` from the root of this project in your command line.
+4. To run, simply write `npm install` then `npm start` from the root of this project in your command line.
 
 
 ### How to host on a Google Cloud Service
