@@ -4,6 +4,8 @@ const sgMail = require('@sendgrid/mail');
 /*
 EDIT THE CONFIG BELOW BEFORE RUNNING
 
+This function takes in class list even though there is a conflict in schedule
+
 email: McGill Minerva username
 password: McGill Minerva password
 Term - Term you wish to register for, found in VSB URL (ex. term=202005)
@@ -25,7 +27,7 @@ const config = {
     "sgApiKey": "SG.xxx..."
 };
 
-exports.Registration = async (req, res) => {
+exports.multiclass = async (req, res) => {
 
     if (config.wantEmail) {
         sgMail.setApiKey(config.sgApiKey);
