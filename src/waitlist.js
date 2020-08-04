@@ -20,43 +20,66 @@ const config = {
     "regEmail": "firstname.lastname@mail.mcgill.ca",
     "password": "password",
     "term": "202009",
-    "CRN": ["289"],
     "numberClass": 1,
-    "url": "https://vsb.mcgill.ca/vsb/criteria.jsp?access=0&lang=en&tip=1&page=results&scratch=0&term=202101&sort=none&filters=iiiiiiiii&bbs=&ds=&cams=Distance_Downtown_Macdonald_Off-Campus&locs=any&isrts=&course_0_0=COMP-302&sa_0_0=&cs_0_0=--202101_15792--&cpn_0_0=&csn_0_0=&ca_0_0=&dropdown_0_0=al&ig_0_0=0&rq_0_0=",
+    "url": "https://vsb.mcgill.ca/vsb/criteria.jsp?access=0&lang=en&tip=1&page=results&scratch=0&term=202009&sort=none&filters=iiiiiiiii&bbs=&ds=&cams=Distance_Downtown_Macdonald_Off-Campus&locs=any&isrts=&course_0_0=MATH-240&sa_0_0=&cs_0_0=--202009_19696--&cpn_0_0=&csn_0_0=&ca_0_0=&dropdown_0_0=us_--202009_19696--&ig_0_0=0&rq_0_0=",
     "wantEmail": true,
     "notifEmail": "",
     "sgApiKey": "SG.xxx..."
 };
 
-async function determineRegisterableClass(page){
+async function determineRegisterableClass(page) {
     //should be just be able to do crn.length as these classes does not have tutorial
     let availableClass = [];
-    for (let i = 1; i <= config.numberClass ; i++) {
-        const selector = "#legend_box > div:nth-child("+i+") > div > div > div > label > div > div.selection_table > table";
+    for (let i = 1; i <= config.numberClass; i++) {
+        const selector = "#legend_box > div:nth-child(" + i + ") > div > div > div > label > div > div.selection_table > table";
         const table = await page.$$eval(selector, trs => trs.map(tr => {
             const tds = [...tr.getElementsByTagName('td')];
             return tds.map(td => td.textContent);
         }));
-       const lectureContent = table[0][1];
+        const lectureContent = table[0][1];
         //CRN:[0-9]+
         //Seats:.+?(?=Waitlist)
         //Waitlist:.*
-        const courseCRN = lectureContent.match("CRN:[0-9]+")[0]
-        const courseSeats = lectureContent.match("Seats:.+?(?=Waitlist)")[0]
-        const courseWaitList = lectureContent.match("Waitlist:.*")[0]
-        if(!courseWaitList.includes("Full")){
-            availableClass.push(courseCRN.split(":")[1])
+        try {
+            const courseCRN = lectureContent.match("CRN:[0-9]+")[0]
+            const courseSeats = lectureContent.match("Seats:.+?(?=Waitlist)")[0]
+            const courseWaitList = lectureContent.match("Waitlist:.*")[0]
+
+            if (courseWaitList.includes("None") && !courseSeats.includes("Full")) {
+                availableClass.push(courseCRN.split(":")[1])
+            }
+            if (!courseWaitList.includes("Full") && !courseSeats.includes("Full")) {
+                availableClass.push(courseCRN.split(":")[1])
+            }
+
+        } catch (e) {
+            const courseCRN = lectureContent.match("CRN:[0-9]+")[0]
+            const courseSeats = lectureContent.match("Seats:.")[0]
+            if (!courseSeats.includes("Full")) {
+                availableClass.push(courseCRN.split(":")[1])
+            }
         }
     }
+
     return availableClass;
 }
 
+async function sendEmail() {
+    sgMail.setApiKey(config.sgApiKey);
+    let msg = {
+        to: config.notifEmail,
+        from: {
+            email: "minerva.registration@mcgill.ca ",
+            name: "Minerva"
+        },
+        subject: "Successful Registration For Semester " + config.term,
+        text: "At least one class was registered. Please check minerva @ www.mcgill.ca/minerva."
+    };
+    await sgMail.send(msg)
+    console.log("Email Sent!");
+}
 
 exports.waitlist = async (req, res) => {
-
-    if (config.wantEmail) {
-        sgMail.setApiKey(config.sgApiKey);
-    }
 
     let browser = await puppeteer.launch({
         args: ['--no-sandbox'],
@@ -82,19 +105,8 @@ exports.waitlist = async (req, res) => {
         await page.waitForNavigation({waitUntil: 'networkidle0'});
 
         console.log("Login Successful");
-        //navigation to student
-        await page.waitForXPath("/html/body/div[1]/div[2]/span/map/table/tbody/tr[1]/td/table/tbody/tr/td[5]", {waitUntil: 'networkidle0'}).then(selector => selector.click());
 
-        //navigates to registration
-        /*
-        McGill COVID19 changed the xpath old one: /html/body/div[3]/table[1]/tbody/tr[2]/td[2]/a
-         */
-        await page.waitForXPath("/html/body/div[3]/table[1]/tbody/tr[3]/td[2]/a", {waitUntil: 'networkidle0'}).then(selector => selector.click());
-        await page.waitForNavigation();
-
-        //navigates to quick add drop
-        await page.waitForXPath("/html/body/div[3]/table[1]/tbody/tr[3]/td[2]/a", {waitUntil: 'networkidle0'}).then(selector => selector.click());
-        await page.waitFor(500);
+        await page.goto("https://horizon.mcgill.ca/pban1/bwskfreg.P_AltPin", {waitUntil: 'networkidle0'})
 
         //selects the term and navigates to next page
         await page.select('#term_id', config.term);
@@ -102,9 +114,9 @@ exports.waitlist = async (req, res) => {
         await page.waitForNavigation();
         console.log("Term " + config.term + " found, Starting to input CRNs");
         //inputs all the crn and submits them
-        for (let i = 0; i < config.CRN.length; i++) {
+        for (let i = 0; i < classToRegister.length; i++) {
             let inputID = "#crn_id" + (i + 1);
-            let crn = config.CRN[i];
+            let crn = classToRegister[i];
             await page.type(inputID, crn, {delay: 30})
         }
         await page.waitForXPath("/html/body/div[3]/form/input[19]", {waitUntil: 'networkidle0'}).then(selector => selector.click());
@@ -137,23 +149,10 @@ exports.waitlist = async (req, res) => {
         }
 
         if (config.wantEmail) {
-
-            let msg = {
-                to: config.notifEmail,
-                from: {
-                    email: "minervaRegistration@mcgill.ca ",
-                    name: "Minerva"
-                },
-                subject: "Successful Registration For Semester " + config.term,
-                text: "At least one class was registered. Please check minerva @ www.mcgill.ca/minerva."
-            };
-            await sgMail.send(msg);
-            console.log("Email Sent!");
+            await sendEmail()
         }
-
     } else {
         console.log("Class is full!");
     }
     browser.close();
-    res.send();
 };
