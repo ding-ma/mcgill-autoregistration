@@ -17,11 +17,11 @@ sgApiKey - Received when registered for sendgrid, leave blank is wantEmail is fa
 */
 
 const config = {
-    "regEmail": "",
-    "password": "",
-    "term": "202009",
+    "regEmail": "yiyi.yang3@mail.mcgill.ca", //change empty string to your McGill email
+    "password": "yang12", //change empty string to your password
+    "term": "202009", 
     "CRN": ["18276"],
-    "subject": "COMP",
+    "subject": "COMP", //
     "courseNumber": "310",
     "url": "https://vsb.mcgill.ca/vsb/criteria.jsp?access=0&lang=en&tip=1&page=results&scratch=0&term=202009&sort=none&filters=iiiiiiiii&bbs=&ds=&cams=Distance_Downtown_Macdonald_Off-Campus&locs=any&isrts=&course_0_0=COMP-310&sa_0_0=&cs_0_0=--202009_18276--&cpn_0_0=&csn_0_0=&ca_0_0=&dropdown_0_0=us_--202009_18276--&ig_0_0=0&rq_0_0=",
     "wantEmail": true,
@@ -29,7 +29,28 @@ const config = {
     "sgApiKey": "SG.xxx..."
 };
 
-async function determineRegisterableClass(page) {
+async function sendEmail() {
+    sgMail.setApiKey(config.sgApiKey);
+    let msg = {
+        to: config.notifEmail,
+        from: {
+            email: "minerva.registration@mcgill.ca ",
+            name: "Minerva"
+        },
+        subject: "Successful Registration For Semester " + config.term,
+        text: "At least one class was registered. Please check minerva @ www.mcgill.ca/minerva."
+    };
+    await sgMail.send(msg)
+    console.log("Email Sent!");
+}
+
+exports.closedsection = async(req, res) => {
+
+    let browser = await puppeteer.launch({
+        args: ['--no-sandbox'],
+        headless: true //set to false if you want to see browser
+    });
+    let page = await browser.newPage();
 
     console.log("Logging in...");
 
@@ -79,11 +100,19 @@ async function determineRegisterableClass(page) {
     //check if the section is full
     if(document.querySelectorAll('abbr')[13].title != "Closed"){
         selector => selector.click() //or document.querySelectorAll('input[value=Register]')[0].click()
+
+        if (config.wantEmail) {
+            await sendEmail()
+        }
+    }
+    else{
+        console.log("Section is currently full")
     }
 
 
-    //checks if there are errors after registration
 
-    return ;
+
+    
+    browser.close()
+    res.send()
 }
-
