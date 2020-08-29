@@ -17,8 +17,8 @@ sgApiKey - Received when registered for sendgrid, leave blank is wantEmail is fa
 */
 
 const config = {
-    "regEmail": "yiyi.yang3@mail.mcgill.ca", //change empty string to your McGill email
-    "password": "yang12", //change empty string to your password
+    "regEmail": "", //change empty string to your McGill email
+    "password": "", //change empty string to your password
     "term": "202009", 
     "CRN": ["18276"],
     "subject": "COMP", //
@@ -46,56 +46,63 @@ async function sendEmail() {
 
 exports.closedsection = async(req, res) => {
 
-    let browser = await puppeteer.launch({
-        args: ['--no-sandbox'],
-        headless: true //set to false if you want to see browser
-    });
-    let page = await browser.newPage();
+    try {
+        let browser = await puppeteer.launch({
+            args: ['--no-sandbox'],
+            headless: false //set to false if you want to see browser
+        });
+        let page = await browser.newPage();
 
-    console.log("Logging in...");
+        console.log("Logging in...");
 
-    await page.goto('https://horizon.mcgill.ca/pban1/twbkwbis.P_WWWLogin', {waitUntil: 'networkidle0'});
+        await page.goto('https://horizon.mcgill.ca/pban1/twbkwbis.P_WWWLogin', {waitUntil: 'networkidle0'});
+        await page.waitForNavigation();
 
-    //logs in
-    await page.type('#mcg_un', config.regEmail, {delay: 30});
-    await page.type('#mcg_pw', config.password, {delay: 30});
-    await page.click('#mcg_un_submit');
-    await page.waitForNavigation({waitUntil: 'networkidle0'});
 
-    console.log("Login Successful");
+        //logs in
+        await page.type('#mcg_un', config.regEmail, {delay: 30});
+        await page.type('#mcg_pw', config.password, {delay: 30});
+        await page.click('#mcg_un_submit');
+        await page.waitForNavigation({waitUntil: 'networkidle0'});
 
-    await page.goto("https://horizon.mcgill.ca/pban1/bwskfcls.p_sel_crse_search", {waitUntil: 'networkidle0'})
+        console.log("Login Successful");
 
-    //selects the term and navigates to next page
-    await page.select('#term_id', config.term);
-    await page.waitForXPath("/html/body/div[3]/form/input", {waitUntil: 'networkidle0'}).then(selector => selector.click());
-    await page.waitForNavigation();
-    console.log("Term " + config.term + " found, proceed to subject");
+        await page.goto("https://horizon.mcgill.ca/pban1/bwskfcls.p_sel_crse_search", {waitUntil: 'networkidle0'})
 
-    //selects the Subject and search for course\
-    await page.select('#sub_id', config.subject);
-    await page.waitForXPath("/html/body/div[3]/form/input[17]", {waitUntil: 'networkidle0'}).then(selector => selector.click());
-    await page.waitForNavigation();
-    console.log("Subject " + config.subject + " found, proceed to select course");
+        //selects the term and navigates to next page
+        await page.select('#term_input_id', config.term);
+        await page.waitForXPath("/html/body/div[3]/form/input", {waitUntil: 'networkidle0'}).then(selector => selector.click());
+        await page.waitForNavigation();
+        console.log("Term " + config.term + " found, proceed to subject");
 
-    //select the course and proceed to check availability
-    var parentElement;
-    for(let i = 0; i<document.length; i++){
-        let navigator = document.querySelectorAll('input[name=SEL_CRSE]')[i]
-        if(navigator == config.courseNumber){
-            parentElement  = navigator.parentElement
-            break
+        //selects the Subject and search for course\
+        await page.select('#sub_id', config.subject);
+        await page.waitForXPath("/html/body/div[3]/form/input[17]", {waitUntil: 'networkidle0'}).then(selector => selector.click());
+        await page.waitForNavigation();
+        console.log("Subject " + config.subject + " found, proceed to select course");
+
+        //select the course and proceed to check availability
+        var parentElement;
+        for(let i = 0; i<document.length; i++){
+            let navigator = document.querySelectorAll('input[name=SEL_CRSE]')[i]
+            if(navigator == config.courseNumber){
+                parentElement  = navigator.parentElement
+                break
+            }
         }
-    }
-    for(let i = 0; i<document.length; i++){
-        let navigator = parentElement.childElement[i]
-        if(navigator.name == "SUB_BTN"){
-            navigator.click()
+        for(let i = 0; i<document.length; i++){
+            let navigator = parentElement.childElement[i]
+            if(navigator.name == "SUB_BTN"){
+                navigator.click()
+            }
         }
+        await page.waitForNavigation();
+        console.log("Course " + config.subject +config.courseNumber+ " found, proceed to check availability");
     }
-    await page.waitForNavigation();
-    console.log("Course " + config.subject +config.courseNumber+ " found, proceed to check availability");
 
+        catch(e) {
+            console.log('Catch an error: ', e)
+          }
 
     //check if the section is full
     if(document.querySelectorAll('abbr')[13].title != "Closed"){
@@ -109,6 +116,9 @@ exports.closedsection = async(req, res) => {
         console.log("Section is currently full")
     }
 
+      
+
+
 
 
 
@@ -116,3 +126,4 @@ exports.closedsection = async(req, res) => {
     browser.close()
     res.send()
 }
+
