@@ -19,7 +19,7 @@ sgApiKey - Received when registered for sendgrid, leave blank is wantEmail is fa
 const config = {
     "regEmail": "", //change empty string to your McGill email
     "password": "", //change empty string to your password
-    "term": "202009", 
+    "term": "202009",
     "CRN": ["18276"],
     "subject": "COMP", //
     "courseNumber": "310",
@@ -70,8 +70,9 @@ exports.closedsection = async(req, res) => {
         await page.goto("https://horizon.mcgill.ca/pban1/bwskfcls.p_sel_crse_search", {waitUntil: 'networkidle0'})
 
         //selects the term and navigates to next page
-        await page.select('#term_input_id', config.term);
-        await page.waitForXPath("/html/body/div[3]/form/input", {waitUntil: 'networkidle0'}).then(selector => selector.click());
+        await page.select('select[name="p_term"]', config.term);
+        await page.waitForXPath("/html/body/div[3]/form/input[3]", {waitUntil: 'networkidle0'}).then(selector => selector.click());
+
         await page.waitForNavigation();
         console.log("Term " + config.term + " found, proceed to subject");
 
@@ -116,13 +117,13 @@ exports.closedsection = async(req, res) => {
         console.log("Section is currently full")
     }
 
-      
 
 
 
 
 
-    
+
+
     browser.close()
     res.send()
 }
