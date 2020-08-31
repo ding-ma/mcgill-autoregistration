@@ -1,6 +1,6 @@
 const {multiclass} = require("./multiclassRegister");
 const {waitlist} = require("./waitlist")
-const {closedsection} = require("./closedSection")
+const {closedSection} = require("./closedSection")
 
 // boiler code to call the Registration function
 // multiclass().then(r => {
@@ -8,6 +8,6 @@ const {closedsection} = require("./closedSection")
 // });
 
 
-closedsection().then(r => {
+closedSection().then(r => {
     console.log(r)
 });
