@@ -19,8 +19,7 @@ sgApiKey - Received when registered for sendgrid, leave blank is wantEmail is fa
 const config = {
     "regEmail": "", //change empty string to your McGill email
     "password": "", //change empty string to your password
-    "term": "202009",
-    "CRN": ["18276"],
+    "term": "202009", 
     "subject": "COMP", //
     "courseNumber": "310",
     "url": "https://vsb.mcgill.ca/vsb/criteria.jsp?access=0&lang=en&tip=1&page=results&scratch=0&term=202009&sort=none&filters=iiiiiiiii&bbs=&ds=&cams=Distance_Downtown_Macdonald_Off-Campus&locs=any&isrts=&course_0_0=COMP-310&sa_0_0=&cs_0_0=--202009_18276--&cpn_0_0=&csn_0_0=&ca_0_0=&dropdown_0_0=us_--202009_18276--&ig_0_0=0&rq_0_0=",
@@ -46,7 +45,7 @@ async function sendEmail() {
 
 exports.closedsection = async(req, res) => {
 
-    try {
+
         let browser = await puppeteer.launch({
             args: ['--no-sandbox'],
             headless: false //set to false if you want to see browser
@@ -72,59 +71,40 @@ exports.closedsection = async(req, res) => {
         //selects the term and navigates to next page
         await page.select('select[name="p_term"]', config.term);
         await page.waitForXPath("/html/body/div[3]/form/input[3]", {waitUntil: 'networkidle0'}).then(selector => selector.click());
-
         await page.waitForNavigation();
         console.log("Term " + config.term + " found, proceed to subject");
 
-        //selects the Subject and search for course\
-        await page.select('#sub_id', config.subject);
+        //selects the Subject and search for course
+        await page.select('#subj_id', config.subject);
         await page.waitForXPath("/html/body/div[3]/form/input[17]", {waitUntil: 'networkidle0'}).then(selector => selector.click());
         await page.waitForNavigation();
         console.log("Subject " + config.subject + " found, proceed to select course");
 
         //select the course and proceed to check availability
-        var parentElement;
-        for(let i = 0; i<document.length; i++){
-            let navigator = document.querySelectorAll('input[name=SEL_CRSE]')[i]
-            if(navigator == config.courseNumber){
-                parentElement  = navigator.parentElement
-                break
-            }
-        }
-        for(let i = 0; i<document.length; i++){
-            let navigator = parentElement.childElement[i]
-            if(navigator.name == "SUB_BTN"){
-                navigator.click()
-            }
-        }
+        await page.waitForXPath("/html/body/div[3]/table[2]/tbody/tr[14]/td[3]/form/input[30]", {waitUntil: 'networkidle0'}).then(selector => selector.click());
         await page.waitForNavigation();
         console.log("Course " + config.subject +config.courseNumber+ " found, proceed to check availability");
-    }
 
-        catch(e) {
-            console.log('Catch an error: ', e)
-          }
+        try {
 
-    //check if the section is full
-    if(document.querySelectorAll('abbr')[13].title != "Closed"){
-        selector => selector.click() //or document.querySelectorAll('input[value=Register]')[0].click()
+        //check the checkbox if there is one and register for course
+        await page.waitForXPath("/html/body/div[3]/form/table/tbody/tr[3]/td[1]/input[1]", {waitUntil: 'networkidle0'}).then(selector => selector.click());
+        await page.waitForXPath("/html/body/div[3]/form/input[7]", {waitUntil: 'networkidle0'}).then(selector => selector.click());
 
-        if (config.wantEmail) {
+
+        console.log("Successfully registered.")
+        
+        if(config.wantEmail){
             await sendEmail()
         }
     }
-    else{
-        console.log("Section is currently full")
+
+    catch(e){
+        console.log("Registration for " + config.subject+config.courseNumber + " failed.")
     }
 
-
-
-
-
-
-
-
+    
     browser.close()
-    res.send()
 }
+
 
