@@ -17,7 +17,7 @@ The script first webscrappes VSB to determine if there is a place available in t
 
 
 ### How to host on a Google Cloud Service
-1. Create a _Cloud Function_ with content of `src/multiclassRegister.js`. Use HTTP Trigger, 512mb of ram, function to execute is `Registration`, allow unauthorized requests (makes life easier).
+1. Create a _Cloud Function_ with content of `src/multiclassRegister.js`. Use HTTP Trigger, 512mb of ram, function to execute is `multiclass`, allow unauthorized requests (makes life easier).
 2. Modify the `config` json variable as needed in the script.
 3. Use the following `package.json` for GCP since the `npm start` is slightly different from the one located at the root of the project.
 ```
@@ -28,7 +28,7 @@ The script first webscrappes VSB to determine if there is a place available in t
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "index.Registration"
+    "start": "index.(your_chosen_function)"
   },
   "keywords": [],
   "author": "",
