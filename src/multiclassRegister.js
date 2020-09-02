@@ -35,7 +35,7 @@ exports.multiclass = async (req, res) => {
 
     let browser = await puppeteer.launch({
         args: ['--no-sandbox'],
-        headless: true //set to false if you want to see browser
+        headless: false //set to false if you want to see browser
     });
     let page = await browser.newPage();
 
@@ -73,20 +73,13 @@ exports.multiclass = async (req, res) => {
         await page.waitForNavigation({waitUntil: 'networkidle0'});
 
         console.log("Login Successful");
-        //navigation to student
-        await page.waitForXPath("/html/body/div[1]/div[2]/span/map/table/tbody/tr[1]/td/table/tbody/tr/td[5]", {waitUntil: 'networkidle0'}).then(selector => selector.click());
-
-        //navigates to registration
-        /*
-        McGill COVID19 changed the xpath old one: /html/body/div[3]/table[1]/tbody/tr[2]/td[2]/a
-         */
-        await page.waitForXPath("/html/body/div[3]/table[1]/tbody/tr[3]/td[2]/a", {waitUntil: 'networkidle0'}).then(selector => selector.click());
-        await page.waitForNavigation();
+        await page.goto("https://horizon.mcgill.ca/pban1/twbkwbis.P_GenMenu?name=bmenu.P_RegMnu&param_name=SRCH_MODE&param_val=NON_NT", {waitUntil: 'networkidle0'})
 
         //navigates to quick add drop
         await page.waitForXPath("/html/body/div[3]/table[1]/tbody/tr[3]/td[2]/a", {waitUntil: 'networkidle0'}).then(selector => selector.click());
-        await page.waitFor(500);
 
+
+        await page.waitForXPath("/html/body/div[3]/form/table/tbody/tr[1]/td[2]/select")
         //selects the term and navigates to next page
         await page.select('#term_id', config.term);
         await page.waitForXPath("/html/body/div[3]/form/input", {waitUntil: 'networkidle0'}).then(selector => selector.click());
