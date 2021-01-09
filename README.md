@@ -1,23 +1,54 @@
 # McGill Minerva Automatic register
 The goal of this project is to use a cloud service like AWS or GCP and create a cron job in order to run them at specific intervals
 
-The script first webscrappes VSB to determine if there is a place available in the class, then it will proceed to register. If you think that I'm stealing your credentials for minerva, just go look at the source code, it is 148 lines. 
+The script first webscrapes VSB to determine if there is a place available in the class, then it will proceed to register. If you think that I'm stealing your credentials for minerva, just go look at the source code, it is 148 lines. 
 
 **WARNING**: This program is to be used with people with knowledge with cloud infrastructure and node.js. I tried my best to make the instructions clear but anyone with any prior knowledge should be able to figure things out. Contact me if you need help!
-### Dependencies
-* Node.js with npm
-* Puppeteer
-* SendGrid for email services (Optional)
 
-## How To use locally
+## To run
+1. rename `sample.env` to `.env`
+1. rename `sample.env.yml` to `.env.yml`
+1. fill out both `.env` file. The yml file is used for google cloud function whereas the regular one is for local
+
+**DO NOT** touch the `package.json` in the `src` folder as they are used for deploying through the CLI.
+
+## How to use locally
 1. Go on VSB and copy the URL after you have chosen your classes.
-2. Modify the content of `config` JSON in `src/multiclassRegister.js` to match yours. 
+2. Modify the content of `config` JSON in `src/function.js` to match yours. 
 4. The CRN is a list of all CRN of the class you would like to register. Those can be found on VSB also.
 4. To run, simply write `npm install` then `npm start` from the root of this project in your command line.
 
 
 ### How to host on a Google Cloud Service
-1. Create a _Cloud Function_ with content of `src/multiclassRegister.js`. Use HTTP Trigger, 512mb of ram, function to execute is `multiclass`, allow unauthorized requests (makes life easier).
+Available function name:
+* `closedSection` for closed section class
+* `multiclass` for multiclass registration on one function
+* `waitlist` for a waitlist class
+
+Readme in `src` folder has more detailed information
+#### Through CLI
+Assuming you have a project and already logged in. During this process, it ask you to enable some API, simply hit yes.
+To deploy a function, simply run
+
+1.
+```
+gcloud functions deploy FUNCTION_NAME --source=src/FOLDER --trigger-http --allow-unauthenticated --env-vars-file=.env.yml --runtime=nodejs14 --memory=512MB
+```
+
+Give it a function name and make sure to mark the correct source folder for the script you want to deploy. 
+This will return a `httpsTrigger url` and you can use that in cloud scheduler.
+
+2. 
+``` 
+gcloud scheduler jobs create http NAME --schedule "* * * * 15" --uri=HTTPURL --http-method GET
+```
+
+Give the cloud scheduler a `NAME`, make sure to change the `schedule` and the `uri`. It is currently set for every 15 min.
+You can use [crontab guru](https://crontab.guru/) to customize it. The more frequent you run it, the higher your bill will be.
+Feel free to customize the rest of the fields to your liking, but those are the basics to run the project on GCP.
+
+#### Through GUI (not recommended)
+1. Create a _Cloud Function_ with content of `src/SCRIPT_YOU_WANT/function.js`. Use HTTP Trigger, 512mb of ram, function to execute is the `export.FUNCTIONNAME`, allow unauthorized requests (makes life easier).
 2. Modify the `config` json variable as needed in the script.
 3. Use the following `package.json` for GCP since the `npm start` is slightly different from the one located at the root of the project.
 ```
@@ -35,7 +66,8 @@ The script first webscrappes VSB to determine if there is a place available in t
   "license": "ISC",
   "dependencies": {
     "puppeteer": "^2.1.1",
-    "@sendgrid/mail": "^6.5.5"
+    "@sendgrid/mail": "^6.5.5",
+    "dotenv": "^8.2.0",
   }
 }
 ```
@@ -47,11 +79,11 @@ If you do not want to have email notifications, set `"wantEmail": false` in `con
 To receive emails follow these steps:
 1. Sign up on [_sendgrid_](https://sendgrid.com/).
 2. Copy down the API key and use it in the program.
-3. Write your email on line 110 of `multiclassRegister.js`.
+3. Write your email on line 110 of `function.js`.
 
 A free trial should be more than enough for our purposes as we get 100 free emails a day.
 
-### Documentaion of Config
+### Documentation of `.env`
 Below, all the fields of the `config` JSON are described
 * `email`: McGill Minerva username
 * `password`: McGill Minerva password
@@ -64,7 +96,7 @@ Below, all the fields of the `config` JSON are described
 
 ### Couple notes:
 * There is a **MAXIMUM** of 10 CRN that you can have, those included the tutorial's CRN.
-* Each CRN must be within double quotes `"YOUR_CRN"`
+* Each CRN must be comma separated with **NO SPACE**
 * The `semester`field needs to follow this pattern: YYYYMM
 * YYYY represents the academic year
 * MM is the semester where Fall is 09, Winter is 01, Summer is 05.\
@@ -72,7 +104,7 @@ For example, if I want to register for fall 2020, I would write 202009.
 * The script checks on vsb first to see if there are spots in the class. If so, it will proceed to register on Minerva. 
 This is to prevent using all the registration limit which is around 1000 per semester.
 * To run on the cloud, we need to use the headless version of chrome ` headless: true`, if you want to see the browser,
-simply set to ` headless: false` in `multiclassRegister.js`. 
+simply set to ` headless: false` in `function.js`. 
 * You can have conflicting classes schedule in VSB, the program will still work like this:
 ![image](https://user-images.githubusercontent.com/43629633/78501009-e05f6700-7727-11ea-91d5-e3f98ce7e77b.png)\
 You will need to find the CRN of them separately because VSB will not generate a schedule for you.
@@ -86,7 +118,7 @@ const config = {
     "regEmail": "firstname.lastname@mail.mcgill.ca",
     "password": "password",
     "term": "202005",
-    "CRN": ["527", "528", "491", "850", "285", "288", "289"],
+    "CRN": "527,528,491,850,285,288,289",
     "url": "https://vsb.mcgill.ca/vsb...",
     "wantEmail": true,
     "notifEmail": "",

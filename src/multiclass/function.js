@@ -1,34 +1,20 @@
 const puppeteer = require('puppeteer');
 const sgMail = require('@sendgrid/mail');
+require('dotenv').config();
 
-/*
-EDIT THE CONFIG BELOW BEFORE RUNNING
-
-This function takes in class list even though there is a conflict in schedule
-
-email: McGill Minerva username
-password: McGill Minerva password
-Term - Term you wish to register for, found in VSB URL (ex. term=202005)
-CRN - List of CRNs you wish to register for, found in VSB at bottom of screen
-url - Select the classes you want on VSB for your selected term then copy the URL over
-wantEmail - Set to true if you want an email notification upon successful registration
-notifEmail - Where to send notification email to, leave blank if wantEmail is false
-sgApiKey - Received when registered for sendgrid, leave blank is wantEmail is false
-*/
 
 const config = {
-    "regEmail": "firstname.lastname@mail.mcgill.ca",
-    "password": "password",
-    "term": "202009",
-    "CRN": ["289"],
-    "url": "VSB_URL",
-    "wantEmail": true,
-    "notifEmail": "",
-    "sgApiKey": "SG.xxx..."
+    "regEmail": process.env.EMAIL,
+    "password": process.env.PASSWORD,
+    "term": process.env.TERM,
+    "CRN": process.env.CRN.split(","),
+    "url": process.env.VSB_URL,
+    "wantEmail": process.env.WANT_EMAIL,
+    "notifEmail": process.env.NOTIF_EMAIL,
+    "sgApiKey": process.env.SG_API_KEY
 };
 
 exports.multiclass = async (req, res) => {
-
     if (config.wantEmail) {
         sgMail.setApiKey(config.sgApiKey);
     }

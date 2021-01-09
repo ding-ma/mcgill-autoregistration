@@ -1,33 +1,20 @@
 const puppeteer = require('puppeteer');
 const sgMail = require('@sendgrid/mail');
+require('dotenv').config();
 
-/*
-EDIT THE CONFIG BELOW BEFORE RUNNING
-
-THIS PROGRAM only takes in a class schedule WITHOUT conflicts. If there are schedule conflict, run 2 jobs :')
-
-email: McGill Minerva username
-password: McGill Minerva password
-Term - Term you wish to register for, found in VSB URL (ex. term=202005)
-CRN - class CRN that you wish to register along with the tutorials
-url - Select the ONLY class you want on VSB for your selected term then copy the URL over
-wantEmail - Set to true if you want an email notification upon successful registration
-notifEmail - Where to send notification email to, leave blank if wantEmail is false
-sgApiKey - Received when registered for sendgrid, leave blank is wantEmail is false
-*/
 
 const config = {
-    "regEmail": "firstname.lastname@mail.mcgill.ca",
-    "password": "password",
-    "term": "202009",
-    "numberClass": 1,
-    "url": "https://vsb.mcgill.ca/vsb/criteria.jsp?access=0&lang=en&tip=1&page=results&scratch=0&term=202009&sort=none&filters=iiiiiiiii&bbs=&ds=&cams=Distance_Downtown_Macdonald_Off-Campus&locs=any&isrts=&course_0_0=MATH-240&sa_0_0=&cs_0_0=--202009_19696--&cpn_0_0=&csn_0_0=&ca_0_0=&dropdown_0_0=us_--202009_19696--&ig_0_0=0&rq_0_0=",
-    "wantEmail": true,
-    "notifEmail": "",
-    "sgApiKey": "SG.xxx..."
+    "regEmail": process.env.EMAIL,
+    "password": process.env.PASSWORD,
+    "term": process.env.TERM,
+    "CRN": process.env.CRN.split(","),
+    "url": process.env.VSB_URL,
+    "wantEmail": process.env.WANT_EMAIL,
+    "notifEmail": process.env.NOTIF_EMAIL,
+    "sgApiKey": process.env.SG_API_KEY
 };
 
-async function determineRegisterableClass(page) {
+async function determineRegistrableClass(page) {
     //should be just be able to do crn.length as these classes does not have tutorial
     let availableClass = [];
     for (let i = 1; i <= config.numberClass; i++) {
@@ -90,7 +77,7 @@ exports.waitlist = async (req, res) => {
     await page.goto(config.url, {waitUntil: 'networkidle0'});
 
 
-    let classToRegister = await determineRegisterableClass(page);
+    let classToRegister = await determineRegistrableClass(page);
 
     if (classToRegister.length > 0) {
 
