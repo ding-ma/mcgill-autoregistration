@@ -1,9 +1,8 @@
 # ClosedSection
 
 * only works on **1 (one)** class right now
-
-This script is used when the class is marked as closed section from the quick add. 
-
+* This script is used when the class is marked as closed section from the quick add. 
+* Requires manually fill in the XPath of the button of course of choice after selecting the subject
 Function name: `closedSection`
 
 # MultiClassRegister
@@ -19,3 +18,8 @@ Registers on a waitlist class based on VSB
 
 Function name: `waitlist`
 
+# waitlistNotify
+* only works on **1(one)** class right now
+* This function checks if the wait list has a spot(through Minerva)
+* Requires manually fill in the XPath of the button of course of choice after selecting the subject
+Function name: `waitlistNotify`
