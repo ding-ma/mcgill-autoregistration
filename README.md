@@ -24,6 +24,7 @@ Available function name:
 * `closedSection` for closed section class
 * `multiclass` for multiclass registration on one function
 * `waitlist` for a waitlist class
+* `waitlistNotify` for receving an email when wait list has a new empty seat
 
 Readme in `src` folder has more detailed information
 #### Through CLI
