@@ -1,0 +1,14 @@
+{
+    "name": "mcgill-autoregistration",
+    "version": "1.0.0",
+    "description": "",
+    "main": "function.js",
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+      "@sendgrid/mail": "^6.5.5",
+      "dotenv": "^8.2.0",
+      "puppeteer": "^2.1.1"
+    }
+  }
