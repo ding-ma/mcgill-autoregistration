@@ -5,20 +5,19 @@
 * Requires manually fill in the XPath of the button of course of choice after selecting the subject
 Function name: `closedSection`
 
-# MultiClassRegister
 
+# MultiClassRegister
 * This function takes in class list even though there is a conflict in schedule
 * It checks on vsb if there is a class that is not full.
-
 Function name: `multiclass`
 
+
 # Waitlist
-
-Registers on a waitlist class based on VSB
-
+* This function registers for a waitlist class based on VSB
 Function name: `waitlist`
 
-# waitlistNotify
+
+# WaitListNotifier
 * only works on **1(one)** class right now
 * This function checks if the wait list has a spot(through Minerva)
 * Requires manually fill in the XPath of the button of course of choice after selecting the subject
