@@ -17,17 +17,14 @@ sgApiKey - Received when registered for sendgrid, leave blank is wantEmail is fa
 */
 
 const config = {
-    "regEmail": "", //mcgill email address
-    "password": "", //your mcgill password
-    "term": "",//example: 202101 for Winter Semester 2021
-    "subject": "",//four capital letters, example: COMP 
-    "courseNumber": "",//three digits, example: 250
-    "numberClass": 1,
-    "url": "https://vsb.mcgill.ca/vsb/criteria.jsp?access=0&lang=en&tip=1&page=results&scratch=0&term=202101&sort=none&filters=iiiiiiiii&bbs=&ds=&cams=Distance_Downtown_Macdonald_Off-Campus&locs=any&isrts=&course_0_0=MATH-314&sa_0_0=&cs_0_0=--202101_17019--&cpn_0_0=&csn_0_0=&ca_0_0=&dropdown_0_0=al&ig_0_0=0&rq_0_0=",
-    "wantEmail": true,
-    "notifEmail": "",   //email address which you want to receive notification
-    "sgApiKey": ""
-    //IMPORTANT: also need to manually change the XPath on line88 for it to work 
+    "regEmail": process.env.EMAIL,
+    "password": process.env.PASSWORD,
+    "term": process.env.TERM,
+    "CRN": process.env.CRN.split(","),
+    "url": process.env.VSB_URL,
+    "wantEmail": process.env.WANT_EMAIL,
+    "notifEmail": process.env.NOTIF_EMAIL,
+    "sgApiKey": process.env.SG_API_KEY
 };
 
 async function sendEmail() {
