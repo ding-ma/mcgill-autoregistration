@@ -22,7 +22,7 @@ Function name: `waitlist`
 
 # WaitListNotifier
 * only works on **1(one)** class right now
-* This function checks if the wait list has a spot(through Minerva)
+* This function checks if the wait list has a spot(through Minerva) and sends an email if found
 * Requires manually fill in the XPath of the button of course of choice after selecting the subject
 
 Function name: `waitlistNotify`
